@@ -34,7 +34,7 @@ class Matrix3 {
   auto operator*=(const Matrix3& m) -> Matrix3&;
 };
 
-auto operator*(Matrix3 a, Matrix3 b) -> Matrix3;
+auto operator*(Matrix3 a, const Matrix3& b) -> Matrix3;
 auto operator*(Matrix3 m, Vector3 v) -> Vector3;
 
 }  // namespace morpheus
