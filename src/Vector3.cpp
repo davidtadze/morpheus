@@ -1,12 +1,12 @@
+#include "Vector3.hpp"
+
 #include <cassert>
 #include <cmath>
-
-#include "Vector3.hpp"
 
 using namespace morpheus;
 
 auto Vector3::operator[](unsigned int i) -> float& {
-  assert(0 <= i && i < 3);
+  assert(i < 3);
 
   return (&x_)[i];
 }

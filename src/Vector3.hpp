@@ -10,6 +10,7 @@ struct Vector3 {
   float x_{0}, y_{0}, z_{0};
 
  public:
+  Vector3() = default;
   Vector3(float x, float y, float z) : x_(x), y_(y), z_(z) {}
 
   auto x() const -> float { return x_; }
