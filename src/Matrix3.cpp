@@ -4,14 +4,6 @@
 
 #include "Vector3.hpp"
 
-morpheus::Matrix3::Matrix3(float n00, float n01, float n02,
-                           float n10, float n11, float n12,
-                           float n20, float n21, float n22) {
-  n_[0][0] = n00; n_[0][1] = n10; n_[0][2] = n20;
-  n_[1][0] = n01; n_[1][1] = n11; n_[1][2] = n21;
-  n_[2][0] = n02; n_[2][1] = n12; n_[2][2] = n22;
-}
-
 morpheus::Matrix3::Matrix3(const initializer_list_float init_list) {
   assert(init_list.size() == 3);
   for (auto sublist : init_list) assert(sublist.size() == 3);
@@ -20,6 +12,8 @@ morpheus::Matrix3::Matrix3(const initializer_list_float init_list) {
   int col = 0;
   for (auto sublist : init_list) {
     for (float element : sublist) {
+      // swapped index from conventional row, col to col, row
+      // to support subscript operator[] -> Vector3
       n_[col][row] = element;
       ++col;
     }
@@ -28,28 +22,42 @@ morpheus::Matrix3::Matrix3(const initializer_list_float init_list) {
   }
 }
 
-morpheus::Matrix3::Matrix3(const Vector3& a, const Vector3& b, const Vector3& c) {
-  n_[0][0] = a.x(); n_[0][1] = a.y(); n_[0][2] = a.z();
-  n_[1][0] = b.x(); n_[1][1] = b.y(); n_[1][2] = b.z();
-  n_[2][0] = c.x(); n_[2][1] = c.y(); n_[2][2] = c.z();
+morpheus::Matrix3::Matrix3(initializer_list_vector3 init_list) {
+  assert(init_list.size() == 3);
+
+  int row = 0;
+  int col = 0;
+  for (morpheus::Vector3 v : init_list) {
+    for (int row = 0; row < 3; ++row) {
+      // swapped index from conventional row, col to col, row
+      // to support subscript operator[] -> Vector3
+      n_[col][row] = v[row];
+    }
+    ++col;
+  }
 }
 
-auto morpheus::Matrix3::operator()(unsigned int i, unsigned int j) -> float& {
-  return n_[j][i];
+auto morpheus::Matrix3::operator()(int row, int col) -> float& {
+  // swapped index from conventional row, col to col, row
+  // to support subscript operator[] -> Vector3
+  return n_[col][row];
 }
 
-auto morpheus::Matrix3::operator[](unsigned int i) -> Vector3& {
-  return reinterpret_cast<Vector3&>(n_[i]);
+auto morpheus::Matrix3::operator[](int col) -> Vector3& {
+  // interface-wise column of a matrix3 is a vector3
+  // but implementation-wise it's actually a row (because of the way array is stored)
+  // so conventional row, col order needs to be reversed to col, row
+  return reinterpret_cast<Vector3&>(n_[col]);
 }
 
 auto morpheus::Matrix3::operator*=(const Matrix3& m) -> Matrix3& {
   Matrix3 tmp;
-  for (int j = 0; j < 3; ++j) {
+  for (int col = 0; col < 3; ++col) {
     for (int k = 0; k < 3; ++k) {
-      for (int i = 0; i < 3; ++i) {
-        // swapped order from i, j, k to j, k, i
-        // to minimize cache misses
-        tmp(i, j) += (*this)(i, k) * m(k, j);
+      for (int row = 0; row < 3; ++row) {
+        // swapped order from row, col, k to col, k, row
+        // to minimize cache misses (because data is stored in col, row order)
+        tmp(row, col) += (*this)(row, k) * m(k, col);
       }
     }
   }
@@ -64,13 +72,9 @@ auto morpheus::operator*(Matrix3 a, const Matrix3& b) -> Matrix3 {
 
 auto morpheus::operator*(Matrix3 m, Vector3 v) -> Vector3 {
   Vector3 tmp;
-  for (int k = 0; k < 3; ++k) {
-    for (int j = 0; j < 3; ++j) {
-      for (int i = 0; i < 3; ++i) {
-        // swapped order from i, j, k to k, j, i
-        // to minimize cache misses
-        tmp[j] += m(i, k) * v[k];
-      }
+  for (int row = 0; row < 3; ++row) {
+    for (int k = 0; k < 3; ++k) {
+        tmp[row] += m(row, k) * v[k];
     }
   }
   return tmp;

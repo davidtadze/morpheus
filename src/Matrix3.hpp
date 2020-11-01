@@ -6,30 +6,28 @@
 
 #include "Vector3.hpp"
 
-using array_3_3 = std::array<std::array<float, 3>, 3>;
+using array_float_3_3 = std::array<std::array<float, 3>, 3>;
 using initializer_list_float = std::initializer_list<std::initializer_list<float>>;
+using initializer_list_vector3 = std::initializer_list<morpheus::Vector3>;
 
 namespace morpheus {
 
 class Matrix3 {
  private:
-  array_3_3 n_{};
+  array_float_3_3 n_{};
 
  public:
   Matrix3() = default;
-  Matrix3(float n00, float n01, float n02, 
-          float n10, float n11, float n12,
-          float n20, float n21, float n22);
   Matrix3(initializer_list_float init_list);
-  Matrix3(const Vector3& a, const Vector3& b, const Vector3& c);
+  Matrix3(initializer_list_vector3 init_list);
 
-  auto operator()(unsigned int i, unsigned int j) -> float&;
-  auto operator()(unsigned int i, unsigned int j) const -> const float& {
-    return (*this)(i, j);
+  auto operator()(int row, int col) -> float&;
+  auto operator()(int row, int col) const -> const float& {
+    return (*this)(row, col);
   }
 
-  auto operator[](unsigned int i) -> Vector3&;
-  auto operator[](unsigned int i) const -> const Vector3& { return (*this)[i]; }
+  auto operator[](int col) -> Vector3&;
+  auto operator[](int col) const -> const Vector3& { return (*this)[col]; }
 
   auto operator*=(const Matrix3& m) -> Matrix3&;
 };
