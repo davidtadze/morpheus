@@ -12,8 +12,8 @@ morpheus::Matrix3::Matrix3(const initializer_list_float init_list) {
   int col = 0;
   for (auto sublist : init_list) {
     for (float element : sublist) {
-      // swapped index from conventional row, col to col, row
-      // to support subscript operator[] -> Vector3
+      // changed order from conventional row, col to col, row
+      // to support subscript operator[] -> Vector3&
       n_[col][row] = element;
       ++col;
     }
@@ -29,8 +29,8 @@ morpheus::Matrix3::Matrix3(initializer_list_vector3 init_list) {
   int col = 0;
   for (morpheus::Vector3 v : init_list) {
     for (int row = 0; row < 3; ++row) {
-      // swapped index from conventional row, col to col, row
-      // to support subscript operator[] -> Vector3
+      // changed order from conventional row, col to col, row
+      // to support subscript operator[] -> Vector3&
       n_[col][row] = v[row];
     }
     ++col;
@@ -38,15 +38,16 @@ morpheus::Matrix3::Matrix3(initializer_list_vector3 init_list) {
 }
 
 auto morpheus::Matrix3::operator()(int row, int col) -> float& {
-  // swapped index from conventional row, col to col, row
-  // to support subscript operator[] -> Vector3
+  // changed order from conventional row, col to col, row
+  // to support subscript operator[] -> Vector3&
   return n_[col][row];
 }
 
 auto morpheus::Matrix3::operator[](int col) -> Vector3& {
   // interface-wise column of a matrix3 is a vector3
-  // but implementation-wise it's actually a row (because of the way array is stored)
-  // so conventional row, col order needs to be reversed to col, row
+  // but implementation-wise it must be a row to support subscript operator[] -> Vector3& 
+  // (because of the way array is stored in memory)
+  // so changed order from conventional row, col  to reversed col, row
   return reinterpret_cast<Vector3&>(n_[col]);
 }
 
@@ -55,7 +56,7 @@ auto morpheus::Matrix3::operator*=(const Matrix3& m) -> Matrix3& {
   for (int col = 0; col < 3; ++col) {
     for (int k = 0; k < 3; ++k) {
       for (int row = 0; row < 3; ++row) {
-        // swapped order from row, col, k to col, k, row
+        // changed order from row, col k to col, k, row
         // to minimize cache misses (because data is stored in col, row order)
         tmp(row, col) += (*this)(row, k) * m(k, col);
       }
