@@ -22,18 +22,22 @@ class Matrix3 {
   Matrix3(initializer_list_vector3 init_list);
 
   auto operator()(int row, int col) -> float&;
-  auto operator()(int row, int col) const -> const float& {
-    return (*this)(row, col);
-  }
+  auto operator()(int row, int col) const -> const float& { return (*this)(row, col); }
 
   auto operator[](int col) -> Vector3&;
   auto operator[](int col) const -> const Vector3& { return (*this)[col]; }
 
   auto operator*=(const Matrix3& m) -> Matrix3&;
+
+  auto determinant() const -> float;
+  auto inverse() -> Matrix3&;
 };
 
 auto operator*(Matrix3 a, const Matrix3& b) -> Matrix3;
 auto operator*(Matrix3 m, Vector3 v) -> Vector3;
+
+inline auto determinant(const Matrix3& m) -> float { return m.determinant(); }
+inline auto inverse(Matrix3 m) -> Matrix3 { return m.inverse(); }
 
 }  // namespace morpheus
 

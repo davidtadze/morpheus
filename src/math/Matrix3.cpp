@@ -66,6 +66,30 @@ auto morpheus::Matrix3::operator*=(const Matrix3& m) -> Matrix3& {
   return *this;
 }
 
+auto morpheus::Matrix3::determinant() const -> float {
+  return ((*this)(0,0) * ((*this)(1,1) * (*this)(2,2) - (*this)(1,2) * (*this)(2,1))
+	      + (*this)(0,1) * ((*this)(1,2) * (*this)(2,0) - (*this)(1,0) * (*this)(2,2))
+	      + (*this)(0,2) * ((*this)(1,0) * (*this)(2,1) - (*this)(1,1) * (*this)(2,0)));
+}
+
+auto morpheus::Matrix3::inverse() -> Matrix3& {
+  const Vector3& a = (*this)[0];
+  const Vector3& b = (*this)[1];
+  const Vector3& c = (*this)[2];
+
+  Vector3 r0 = cross(b, c);
+  Vector3 r1 = cross(c, a);
+  Vector3 r2 = cross(a, b);
+
+  float inv_det = 1.0F / dot(r2, c);
+
+  *this = {{r0.x() * inv_det, r0.y() * inv_det, r0.z() * inv_det},
+           {r1.x() * inv_det, r1.y() * inv_det, r1.z() * inv_det},
+           {r2.x() * inv_det, r2.y() * inv_det, r2.z() * inv_det}};
+  
+  return *this;
+}
+
 auto morpheus::operator*(Matrix3 a, const Matrix3& b) -> Matrix3 {
   a *= b;
   return a;
