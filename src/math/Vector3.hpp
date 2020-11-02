@@ -6,7 +6,7 @@
 namespace morpheus {
 
 struct Vector3 {
- private:
+ protected:
   float x_{0}, y_{0}, z_{0};
 
  public:

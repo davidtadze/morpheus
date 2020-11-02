@@ -13,7 +13,7 @@ using initializer_list_vector4 = std::initializer_list<morpheus::Vector4>;
 namespace morpheus {
 
 class Matrix4 {
- private:
+ protected:
   array_float_4_4 n_{};
 
  public:
