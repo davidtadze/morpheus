@@ -39,6 +39,16 @@ auto operator*(Matrix3 m, Vector3 v) -> Vector3;
 inline auto determinant(const Matrix3& m) -> float { return m.determinant(); }
 inline auto inverse(Matrix3 m) -> Matrix3 { return m.inverse(); }
 
+auto make_rotation_matrix_x(float t) -> Matrix3;
+auto make_rotation_matrix_y(float t) -> Matrix3;
+auto make_rotation_matrix_z(float t) -> Matrix3;
+auto make_rotation_matrix(float t, const Vector3& a) -> Matrix3;
+auto make_reflection_matrix(const Vector3& a) -> Matrix3;
+auto make_involution_matrix(const Vector3& a) -> Matrix3;
+auto make_scale_matrix(float sx, float sy, float sz) -> Matrix3;
+auto make_scale_matrix(float s, const Vector3& a) -> Matrix3;
+auto make_skew_matrix(float t, const Vector3& a, const Vector3& b) -> Matrix3;
+
 }  // namespace morpheus
 
 #endif  // MORPHEUS_MATRIX3_HPP

@@ -104,3 +104,104 @@ auto morpheus::operator*(Matrix3 m, Vector3 v) -> Vector3 {
   }
   return tmp;
 }
+
+auto morpheus::make_rotation_matrix_x(float t) -> Matrix3 {
+  float c = cos(t);
+  float s = sin(t);
+
+  return {{ 1.0F, 0.0F, 0.0F },
+          { 0.0F, c,    -s   },
+          { 0.0F, s,    c    }};
+}
+
+auto morpheus::make_rotation_matrix_y(float t) -> Matrix3 {
+  float c = cos(t);
+  float s = sin(t);
+
+  return {{c,    0.0F, s   },
+          {0.0F, 1.0F, 0.0F},
+          {-s,   0.0F, c   }};
+}
+
+auto morpheus::make_rotation_matrix_z(float t) -> Matrix3 {
+  float c = cos(t);
+  float s = sin(t);
+
+  return {{ c,    -s,   0.0F },
+          { s,    c,    0.0F },
+          { 0.0F, 0.0F, 1.0F }};
+}
+
+auto morpheus::make_rotation_matrix(float t, const Vector3& a) -> Matrix3 {
+  float c = cos(t);
+  float s = sin(t);
+  float d = 1.0F - c;
+
+  float x = a.x() * d;
+  float y = a.y() * d;
+  float z = a.z() * d;
+  float axay = x * a.y();
+  float axaz = x * a.z();
+  float ayaz = y * a.z();
+
+  return {{ c + x * a.x(),    axay - s * a.z(), axaz + s * a.y() },
+          { axay + s * a.z(), c + y * a.y(),    ayaz - s * a.x() },
+          { axaz - s * a.y(), ayaz + s * a.x(), c + z * a.z()    }};
+}
+
+auto morpheus::make_reflection_matrix(const Vector3& a) -> Matrix3 {
+  float x = a.x() * -2.0F;
+  float y = a.y() * -2.0F;
+  float z = a.z() * -2.0F;
+  float axay = x * a.y();
+  float axaz = x * a.z();
+  float ayaz = y * a.z();
+
+  return {{ x * a.x() + 1.0F, axay,             axaz             },
+          { axay,             y * a.y() + 1.0F, ayaz             },
+          { axaz,             ayaz,             z * a.z() + 1.0F }};
+}
+
+auto morpheus::make_involution_matrix(const Vector3& a) -> Matrix3 {
+  float x = a.x() * 2.0F;
+  float y = a.y() * 2.0F;
+  float z = a.z() * 2.0F;
+  float axay = x * a.y();
+  float axaz = x * a.z();
+  float ayaz = y * a.z();
+
+  return {{ x * a.x() - 1.0F, axay,             axaz             },
+          { axay,             y * a.y() - 1.0F, ayaz             },
+          { axaz,             ayaz,             z * a.z() - 1.0F }};
+}
+
+auto morpheus::make_scale_matrix(float sx, float sy, float sz) -> Matrix3 {
+  return {{ sx,   0.0F, 0.0F },
+          { 0.0F, sy,   0.0F },
+          { 0.0F, 0.0F, sz   }};
+}
+
+auto morpheus::make_scale_matrix(float s, const Vector3& a) -> Matrix3 {
+  s -= 1.0F;
+  float x = a.x() * s;
+  float y = a.y() * s;
+  float z = a.z() * s;
+  float axay = x * a.y();
+  float axaz = x * a.z();
+  float ayaz = y * a.z();
+
+  return {{ x * a.x() + 1.0F, axay,             axaz             },
+          { axay,             y * a.y() + 1.0F, ayaz             },
+          { axaz,             ayaz,             z * a.z() + 1.0F }};
+}
+
+auto morpheus::make_skew_matrix(float t, const Vector3& a, const Vector3& b) -> Matrix3 {
+  t = tan(t);
+  float x = a.x() * t;
+  float y = a.y() * t;
+  float z = a.z() * t;
+
+  return {{ x * b.x() + 1.0F, x * b.y(),        x * b.z()        },
+          { y * b.x(),        y * b.y() + 1.0F, y * b.z()        },
+          { z * b.x(),        z * b.y(),        z * b.z() + 1.0F }};
+}
